@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning</title>
+</head>
+<body>
+
+    <div id="screen">
+
+    </div>
+    <div id="cards">
+        <button onclick="this.dispatchEvent(voteEvent)" value="1" type="button">1</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="2" type="button">2</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="3" type="button">3</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="5" type="button">5</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="8" type="button">8</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="13" type="button">13</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="21" type="button">21</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="34" type="button">34</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="55" type="button">55</button>
+        <button onclick="this.dispatchEvent(voteEvent)" value="89" type="button">89</button>
+        <button onclick="toggleMostrar()" value="2" type="button">Mostrar/Ocultar</button>
+    </div>
+
+    <script type="module">
+        import createVoteListener from './keyboard.js';
+        import createRoom from './room.js';
+        import render from './render.js';
+        import createSocket from './socket.js';
+
+        let voteEvent = document.createEvent('Event');
+        voteEvent.initEvent('vote', true, true);
+
+        const screen = document.getElementById("screen");
+        const voteListener = createVoteListener();
+        const room = createRoom();
+
+        let socket_uri = (window.location.protocol === "https:" ? "wss:" : "ws:") + "//" + window.location.host;
+
+        const ws = createSocket(socket_uri);
+        ws.on('setup', (data) => {
+            console.log(data);
+            Object.assign(room.state, data.state)
+            voteListener.setPlayerId(data.playerId)
+        });
+
+        ws.on('add-player', (data) => {
+            room.addPlayer({ playerId: data.playerId, name: data.player.name })
+        })
+
+        ws.on('remove-player', (data) => {
+            room.removePlayer({ playerId: data.playerId })
+        })
+
+        ws.on('vote', (data) => {
+            room.vote(data)
+        })
+
+        ws.on('show', (data) => {
+            room.toggleShow()
+        })
+        
+        window.room = room;
+        window.voteEvent = voteEvent;
+        window.ws = ws;
+        window.toggleMostrar = () => {
+            ws.send('show', null)
+        }
+        voteListener.subscribe(vote => ws.send('vote', vote));
+
+        render(screen, room, requestAnimationFrame);
+
+    </script>
+</body>
+</html>
