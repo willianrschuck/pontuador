@@ -3,8 +3,11 @@ export default function render(screen, room, requestAnimationFrame) {
 
     for (let playerId in room.state.players) {
         const player = room.state.players[playerId]
-        const p = document.createElement('p');
-        p.innerHTML = player.name + ' - Vote: ' + (player.vote ? (room.state.show ? player.vote : 'x') : '?');
+        const p = document.createElement('div');
+        // const voto = (player.vote ? (room.state.show ? player.vote : '👍🏻') : '🤔');
+        const voto = room.state.show ? (player.vote || '😳') : (player.vote ? '👍🏻' : '🤔');
+        p.innerHTML = voto
+        p.className = 'border col-2 p-3 m-2 rounded-pill border-info bg-info bg-opacity-10 fs-1'
         screen.appendChild(p);
     }
 

@@ -61,6 +61,21 @@ export default function createRoom() {
         })
     }
 
+    function clear() {
+        
+        for (const playerId in state.players) {
+            state.players[playerId].vote = null;
+        }
+
+        state.show = false;
+        
+        notifyAll({
+            type: 'clear',
+            data: {}
+        })
+        
+    }
+
     return {
         vote,
         state,
@@ -68,6 +83,7 @@ export default function createRoom() {
         removePlayer,
         toggleShow,
         subscribe,
+        clear,
         notifyAll
     }
 
