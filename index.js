@@ -44,7 +44,9 @@ wss.on('connection', (ws, req) => {
         if (event == 'vote') {
             room.vote(data);
         } else if (event == 'clear') {
-            room.clear()
+            room.clear();
+        } else if (event == 'spectator') {
+            room.toggleSpectator(data);
         } else if (event == 'show') {
             room.toggleShow();
         }

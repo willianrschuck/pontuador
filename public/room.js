@@ -21,7 +21,8 @@ export default function createRoom() {
         const { playerId, name } = command;
         state.players[playerId] = {
             name,
-            vote: null
+            vote: null,
+            spectator: false
         }
         notifyAll({
             type: 'add-player',
@@ -48,6 +49,18 @@ export default function createRoom() {
             type: 'remove-player',
             data: { playerId }
         })
+    }
+
+    function toggleSpectator(command) {
+        
+        const { playerId } = command;
+        state.players[playerId].spectator = !state.players[playerId].spectator;
+
+        notifyAll({
+            type: 'spectator',
+            data: { playerId }
+        })
+        
     }
 
     function vote(vote) {
@@ -84,6 +97,7 @@ export default function createRoom() {
         toggleShow,
         subscribe,
         clear,
+        toggleSpectator,
         notifyAll
     }
 

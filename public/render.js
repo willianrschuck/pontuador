@@ -1,14 +1,29 @@
+const faces = ['😁', '😃', '🤓', '😎', '😊', '😬', '😌'];
+
 export default function render(screen, room, requestAnimationFrame) {
     screen.innerHTML = '';
 
     for (let playerId in room.state.players) {
+        
         const player = room.state.players[playerId]
-        const p = document.createElement('div');
-        // const voto = (player.vote ? (room.state.show ? player.vote : '👍🏻') : '🤔');
-        const voto = room.state.show ? (player.vote || '😳') : (player.vote ? '👍🏻' : '🤔');
-        p.innerHTML = voto
-        p.className = 'border col-2 p-3 m-2 rounded-pill border-info bg-info bg-opacity-10 fs-1'
-        screen.appendChild(p);
+        const div = document.createElement('div');
+        
+        if (player.spectator === true) {
+            
+            div.innerHTML = '👀';
+            div.className = 'border col-2 p-3 m-2 rounded-pill border-secondary bg-secondary bg-opacity-10 fs-1';
+            
+        } else {
+            
+            const userIdLastChar = playerId.charCodeAt(2);
+            const userFace = faces[userIdLastChar % faces.length];
+            const voto = room.state.show ? (player.vote || '😳') : (player.vote ? userFace+'👍🏻' : '🤔');
+            div.innerHTML = voto;
+            div.className = 'border col-2 p-3 m-2 rounded-pill border-primary bg-primary bg-opacity-10 fs-1';
+            
+        }
+        
+        screen.appendChild(div);
     }
 
     requestAnimationFrame(() => {
