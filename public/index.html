@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+ 
     <title>Planning</title>
     <style>
         html, body {
@@ -36,8 +37,8 @@
         <div class="btn-group">
             <button class="btn btn-outline-secondary" onclick="this.dispatchEvent(voteEvent)" value="🙃" type="button">🙃</button>
             <button class="btn btn-outline-secondary" onclick="this.dispatchEvent(voteEvent)" value="☕️" type="button">☕️</button>
-            <button class="btn btn-outline-secondary" onclick="espectador()" value="2" type="button">👀</button>
         </div>
+        <button class="btn btn-outline-secondary" onclick="espectador()" value="2" type="button">Espectador 👀</button>
         <button class="btn btn-outline-success" onclick="toggleMostrar()" value="2" type="button">Mostrar/Ocultar</button>
         <button class="btn btn-outline-danger" onclick="limpar()" value="2" type="button">Limpar</button>
     </div>
@@ -56,6 +57,29 @@
         const room = createRoom();
 
         let socket_uri = (window.location.protocol === "https:" ? "wss:" : "ws:") + "//" + window.location.host;
+
+
+        let buttons = document.querySelectorAll('#cards .btn-group:first-child .btn');
+
+        function clear() {
+            for (let b of buttons) {
+                b.classList.add('btn-outline-primary');
+                b.classList.remove('btn-primary')
+            }
+        }
+
+        function select(b) {
+            b.classList.add('btn-primary');
+            b.classList.remove('btn-outline-primary')
+        }
+
+        for (let b of buttons) {
+            b.addEventListener('click', (e) => {
+                clear();
+                select(e.target)
+            })
+        }
+        
 
         let playerId;
         const ws = createSocket(socket_uri);
@@ -84,6 +108,7 @@
 
         ws.on('clear', (data) => {
             room.clear()
+            clear();
         })
 
          ws.on('spectator', (data) => {
@@ -103,6 +128,8 @@
             ws.send('spectator', { playerId })
         }
         voteListener.subscribe(vote => ws.send('vote', vote));
+
+        
 
         render(screen, room, requestAnimationFrame);
 

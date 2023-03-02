@@ -9,13 +9,11 @@ export default function createSocket(url) {
     }
 
     function send(event, data) {
-        let jsonData = JSON.stringify({event, data});
+        let jsonData = JSON.stringify({ event, data });
         ws.send(jsonData)
     }
 
     ws.onmessage = msg => {
-
-        console.log(msg)
 
         let json = JSON.parse(msg.data);
         let callbacks = eventCallbacks[json.event]
